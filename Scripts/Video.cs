@@ -17,7 +17,7 @@ using Vuforia;
 /// Changes made to this file could be overwritten when upgrading the Vuforia version.
 /// When implementing custom event handler behavior, consider inheriting from this class instead.
 /// </summary>
-public class DefaultObserverEventHandler : MonoBehaviour
+public class Video : MonoBehaviour
 {
     public enum TrackingStatusFilter
     {
@@ -25,6 +25,8 @@ public class DefaultObserverEventHandler : MonoBehaviour
         Tracked_ExtendedTracked,
         Tracked_ExtendedTracked_Limited
     }
+    public UnityEvent onTrack;
+    public UnityEvent onLost;
 
     /// <summary>
     /// A filter that can be set to either:
@@ -90,7 +92,7 @@ public class DefaultObserverEventHandler : MonoBehaviour
         }
 
         Debug.Log($"Target status: {name} {targetStatus.Status} -- {targetStatus.StatusInfo}");
-
+        
         HandleTargetStatusChanged(mPreviousTargetStatus.Status, targetStatus.Status);
         HandleTargetStatusInfoChanged(targetStatus.StatusInfo);
         
@@ -106,10 +108,12 @@ public class DefaultObserverEventHandler : MonoBehaviour
             if (shouldBeRendererNow)
             {
                 OnTrackingFound();
+                onTrack.Invoke();
             }
             else
             {
                 OnTrackingLost();
+                onLost.Invoke();
             }
         }
         else
@@ -140,6 +144,8 @@ public class DefaultObserverEventHandler : MonoBehaviour
     protected bool ShouldBeRendered(Status status)
     {
         if (status == Status.TRACKED)
+
+
         {
             // always render the augmentation when status is TRACKED, regardless of filter
             return true;
